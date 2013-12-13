@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://rawgithub.com/dcodeIO/Long.js/master/Long.js"></script>
+    <script src="https://rawgithub.com/dcodeIO/ByteBuffer.js/master/ByteBuffer.min.js"></script>
+    <script src="https://rawgithub.com/dcodeIO/ProtoBuf.js/master/ProtoBuf.min.js"></script>
+    <script type="text/javascript">
+        var ProtoBuf = dcodeIO.ProtoBuf;
+        var Message = ProtoBuf.protoFromFile("hello.proto").build("protobuf.Message");
+    </script>
+
+</head>
+<body>
+
+<textarea id="log" style="width: 100%; height: 200px"></textarea><br/>
+<input type="text" id="text" value="hello world!"/>
+<button onclick="send()">Send</button>
+
+<script type="text/javascript">
+    var log = document.getElementById("log");
+    var text = document.getElementById("text");
+    var socket = new WebSocket("ws://localhost:8080/ws");
+    socket.binaryType = "arraybuffer";
+
+    function send() {
+        if (socket.readyState == WebSocket.OPEN) {
+            var msg = new Message(text.value);
+            socket.send(msg.toArrayBuffer());
+            log.value += "Sent: " + msg.text + "\n";
+        } else {
+            log.value += "Not connected\n";
+        }
+    }
+
+    socket.onopen = function () {
+        log.value += "Connected\n";
+    };
+
+    socket.onclose = function () {
+        log.value += "Disconnected\n";
+    };
+
+    socket.onmessage = function (evt) {
+        try {
+            console.log(evt);
+            var msg = Message.decode(evt.data);
+            log.value += "Received: " + msg.text + "\n";
+        } catch (err) {
+            log.value += "Error: " + err + "\n";
+        }
+    };
+
+
+</script>
+
+</body>
+</html>

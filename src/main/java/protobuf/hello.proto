@@ -1,0 +1,7 @@
+package protobuf;
+option java_package = "protobuf";
+
+
+message Message {
+    required string text = 1;
+}

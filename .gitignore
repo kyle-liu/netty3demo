@@ -1,0 +1,12 @@
+.classpath
+.project
+.jar
+.settings
+tmp
+target
+.DS_Store
+*.iml
+.idea
+hsf.configuration
+logs
+.log

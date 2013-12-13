@@ -1,0 +1,90 @@
+<html>
+<head><title>Web Socket Test</title></head>
+<body>
+<script type="text/javascript">
+    var socket;
+    if (!window.WebSocket) {
+        window.WebSocket = window.MozWebSocket;
+    }
+
+    if (window.WebSocket) {
+        //新建webscoket对象
+        socket = new WebSocket("ws://localhost:8080/websocket");
+
+        //收到消息
+        socket.onmessage = function (event) {
+            console.log(event.data);
+            var ta = document.getElementById('responseText');
+            console.log(event.data);
+            ta.value = ta.value + '\n' + event.data
+        };
+
+        //打开
+        socket.onopen = function (event) {
+            var ta = document.getElementById('responseText');
+            ta.value = "Web Socket opened!";
+        };
+        //关闭
+        socket.onclose = function (event) {
+            var ta = document.getElementById('responseText');
+            ta.value = ta.value + "Web Socket closed";
+        };
+    } else {
+        alert("Your browser does not support Web Socket.");
+    }
+
+    //发送消息
+    function send(message) {
+        if (!window.WebSocket) {
+            return;
+        }
+        if (socket.readyState == WebSocket.OPEN) {
+            socket.send(message);
+
+        } else {
+            alert("The socket is not open.");
+        }
+    }
+
+
+    function sendBinary() {
+        if (!window.WebSocket) {
+            return;
+        }
+        if (socket.readyState == WebSocket.OPEN) {
+
+            socket.binaryType = 'arraybuffer';
+            //return new Uint8Array([4, 234, 4545, 2343, 5454, 65, "234234", "TTT", 233, 9, "5454545"]);
+            var file = document.forms[0].upload.files[0];
+            console.log(file);
+            socket.send(file);
+
+
+        } else {
+            alert("The socket is not open.");
+        }
+
+    }
+
+    function getBinaryData() {
+
+    }
+
+
+
+</script>
+<form onsubmit="return false;">
+    <input type="text" name="message" value="Hello, World!"/>
+    <input type="button" value="Send Web Socket Data"
+           onclick="send(this.form.message.value)"/>
+    <br>
+    <input type="file" name="upload"/>
+    <input type="button" value="send binary data" onclick="sendBinary()">
+
+    <h3>Output</h3>
+    <textarea id="responseText" style="width:500px;height:300px;"></textarea>
+</form>
+
+
+</body>
+</html>
